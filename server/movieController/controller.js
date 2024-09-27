@@ -1,7 +1,8 @@
 let Movies =require('../db/model/model')
 let Category = require('../db/model/category');
+let language = require('../db/model/language');
 const {success_function,error_function} = require('../utils/responsehandler');
-const { response } = require('express');
+const { response, query } = require('express');
 const fileUpload = require('../utils/file-upload').fileUpload
 
 exports.Addmovie = async function (req, res) {
@@ -12,14 +13,18 @@ exports.Addmovie = async function (req, res) {
         let Category_Collection = await Category.findOne({category : body.category});
         console.log("Category_Collection : ",Category_Collection);
 
-        let id = Category_Collection._id;
-        console.log("id : ",id);
+        let category_id = Category_Collection._id;
+        console.log("category_id : ",category_id);
 
-        body.category = id;
+        body.category = category_id;
 
+        let language_Collection = await language.findOne({language : body.language});
+        console.log("language_Collection : ",language_Collection);
 
-        let name = body.name;
-        console.log("name : ", name);
+        let language_id = language_Collection._id;
+        console.log("language_id : ",language_id);
+
+        body.language = language_id;
 
         let image = body.image;
         console.log("image : ",image)
@@ -79,7 +84,7 @@ exports.Addmovie = async function (req, res) {
 exports.Getmovie = async function (req,res) {
     try {
         
-        let Movie_Data = await Movies.find().populate("category");
+        let Movie_Data = await Movies.find().populate("category").populate("language");
         console.log("Movie_Data : ",Movie_Data);
 
         let response = {
@@ -104,19 +109,17 @@ exports.Getmovie = async function (req,res) {
 
 exports.Moviefilter = async function (req,res) {
     
-    let filter = req.params.filter;
+    let filter = req.query
     console.log("filter : ",filter);
 
-    let parsed_filter = JSON.parse(filter);
-    console.log("parsed_filter : ",parsed_filter);
 
-    if(parsed_filter.category) {
+    if(filter.category) {
         try {
         
-            let category = req.params.category;
+            let category = req.query.category;
             console.log("category : ",category);
     
-            let category_Field = await Category.findOne({category});
+            let category_Field = await Category.findOne({category : filter.category});
             console.log("category_Field :" ,category_Field);
     
             let category_id = category_Field._id;
@@ -142,18 +145,20 @@ exports.Moviefilter = async function (req,res) {
             }
             res.status(response.statuscode).send(response);
         }
-    }else if(parsed_filter.language && parsed_filter.category){
+    }else if(filter.language && filter.category){
 
         try {
-            let language = req.params.language;
-            let language_Field = await language.findOne({ language });
+            let language = req.query.language;
+
+            let language_Field = await language.findOne({ language});
             console.log("language_Field :", language_Field);
 
             let language_id = language_Field._id;
             console.log("language_id : ", language_id);
 
 
-            let category = req.params.category;
+            let category = req.query.category;
+
             let category_Field = await category.findOne({ category });
             console.log("category_Field :", category_Field);
 
@@ -178,13 +183,13 @@ exports.Moviefilter = async function (req,res) {
             }
             res.status(response.statuscode).send(response);
         }
-    }else if(parsed_filter.language) {
+    }else if(filter.language) {
         try {
         
-            let language = req.params.language;
-            console.log("language : ",language);
+            let languages = req.query.language;
+            console.log("languages : ",languages);
     
-            let language_Field = await language.findOne({language});
+            let language_Field = await language.findOne({language : languages});
             console.log("language_Field :" ,language_Field);
     
             let language_id = language_Field._id;
@@ -250,6 +255,22 @@ exports.Updatemovie = async function (req,res) {
 
     let _id = req.params.id;
     console.log("_id : ",_id);
+
+    let Category_Collection = await Category.findOne({category : body.category});
+        console.log("Category_Collection : ",Category_Collection);
+
+        let category_id = Category_Collection._id;
+        console.log("category_id : ",category_id);
+
+        body.category = category_id;
+
+        let language_Collection = await language.findOne({language : body.language});
+        console.log("language_Collection : ",language_Collection);
+
+        let language_id = language_Collection._id;
+        console.log("language_id : ",language_id);
+
+        body.language = language_id;
 
     let Update_Movie = await Movies.updateOne({_id} , {$set : body});
     console.log("Update_Movie : ",Update_Movie);

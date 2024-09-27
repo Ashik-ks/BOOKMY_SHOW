@@ -19,5 +19,5 @@ let shows = new mongoose.Schema({
     },
 })
 
-let SHOW = mongoose.model('bookmyshow',shows)
+let SHOW = mongoose.model('bookmyshows',shows)
 module.exports = SHOW;
