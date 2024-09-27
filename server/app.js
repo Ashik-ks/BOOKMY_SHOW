@@ -9,10 +9,11 @@ mongoConnect();
 
 
 
-app.use(express.static('../client'))
+app.use(express.static('../client'));
+app.use('/uploads',express.static("./uploads"));
 app.use(express.json())
 app.use(express.urlencoded({extended: true }));
-
+app.use(express.json({limit : "900mb"}));
 app.use(router)
 
 

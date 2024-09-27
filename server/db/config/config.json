@@ -1,0 +1,30 @@
+{
+  "development": {
+    "database": {
+      "url": "mongodb://localhost:27017/BOOKMYSHOW",
+      "options": {
+      }
+    }
+  },
+  "test": {
+    "database": {
+      "url": "mongodb://localhost:27017/BOOKMYSHOW",
+      "options": {
+        
+      }
+    }
+  },
+  "production": {
+    "database": {
+      "protocol": "mongodb",
+      "username": "root",
+      "password": "password",
+      "name": "database_production",
+      "host": "localhost",
+      "port": "",
+      "options": {
+      
+      }
+    }
+  }
+}
