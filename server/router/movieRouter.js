@@ -8,5 +8,7 @@ router.get('/submit/:id',userController.GetSinglemovie);
 router.put('/update/:id',userController.Updatemovie);
 router.delete('/delete/:id',userController.Deletemovie);
 router.get('/filter',userController.Moviefilter);
+router.get('/categories',userController.Getcategories);
+router.get('/languages',userController.Getlanguages);
 
 module.exports = router
