@@ -9,6 +9,10 @@ let shows = new mongoose.Schema({
         type :String,
         // required : true,
     },
+    bgimage : {
+        type :String,
+        // required : true,
+    },
     category : {
         type : mongoose.Schema.Types.ObjectId,
         ref : "category" 

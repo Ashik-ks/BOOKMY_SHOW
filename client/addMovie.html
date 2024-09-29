@@ -1,16 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="style.css">
+    <title>Document</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"><link rel="stylesheet" href="style.css">
 </head>
-
-<body onload="getMovie()">
+<body class="Formbody" onload="getSelectBox()">
 
     <div class="container pt-3">
         <div class="row d-flex justify-content-between">
@@ -130,42 +125,50 @@
         </div>
     </div>
 
-    <div class="container mt-5 heading">Recommended Movies</div>
+    <div class="container mt-5 mb-5" id="formdiv">
+        <div class="container mt-5 heading text-center">Add Your Movie</div>
+        <form onsubmit="AddMovie(event)" class="movie-form">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" placeholder="Enter Movie Name" required>
+            bgimage
+            <label for="image">Image:</label>
+            <input type="file" id="image" name="image" placeholder="Enter Movie Image URL" required>
 
-    <div class="container">
-        <div id="datacontainer" class=""></div>
+            <label for="bgimage">bgimage:</label>
+            <input type="file" id="bgimage" name="bgimage" placeholder="Enter Movie Background Image URL" required>
+    
+            <label for="category">Category:</label>
+            <select name="category" id="category"></select>
+                   
+            <label for="language">language:</label>
+            <select name="language" id="language"></select>
+        
+            <label for="duration">Duration:</label>
+            <input type="text" id="duration" name="duration" placeholder="Enter Movie Duration" required>
+        
+            <label for="releasedate">Release Date:</label>
+            <input type="text" id="release_date" name="releasedate" placeholder="Enter Movie Release Date" required>
+        
+            <label for="cast">Cast:</label>
+            <input type="text" id="cast" name="cast" placeholder="Enter Movie Cast" required>
+        
+            <label for="crew">Crew:</label>
+            <input type="text" id="crew" name="crew" placeholder="Enter Movie Crew" required>
+        
+            <label for="rating">Rating:</label>
+            <input type="number" id="rating" name="rating" min="0" max="10" step="0.1" required>
+        
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" placeholder="Enter Movie Description" rows="4" required></textarea>
+        
+            <button type="submit" class="adminbtn p-2 text-light">Add Movie</button>
+        </form>
+        
     </div>
 
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col"><img src="./images/banner.avif" alt="image" class="bannerimg"></div>
-        </div>
-    </div>
 
-    <div class="container mt-5 heading">The Best Of Life Events</div>
 
-    <div class="container mt-3">
-        <div class="row fivebannerdiv">
-            <div class="col fivebanner"><img src="./images/banner2.avif" alt="" class="fivebannerimg"></div>
-            <div class="col fivebanner"><img src="./images/banner3.avif" alt="" class="fivebannerimg"></div>
-            <div class="col fivebanner"><img src="./images/banner4.avif" alt="" class="fivebannerimg"></div>
-            <div class="col fivebanner"><img src="./images/banner5.avif" alt="" class="fivebannerimg"></div>
-            <div class="col fivebanner"><img src="./images/banner6.avif" alt="" class="fivebannerimg"></div>
-        </div>
-    </div>
-
-    <div class="container mt-5 heading">Trending Searches Right Now</div>
-
-    <div class="container">
-        <div class="row">
-            <div class="col-8">
-                <div id="datacontainer1"></div>
-            </div>
-            <div class="col-4"></div>
-        </div>
-    </div>
-
-    <div class="container-fluid footer">
+    <div class="container-fluid footer mt-5">
         <div class="container footer1 pb-4 pt-3">
             <div class="row d-flex justify-content-center align-items-center">
                 <div class="col-1 text-end"><img src="./images/icons8-circus-tent-64.png" alt="image"
@@ -237,7 +240,7 @@
                 <div class="col border-top  pt-2"></div>
             </div>
         </div>
-
+    
         <div class="container">
             <div class="row text-secondary footerdiv1 text-center">
                 <div class="col-12">
@@ -253,15 +256,9 @@
                 </div>
             </div>
         </div>
-
+    
     </div>
 
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
-    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script><script src="script.js"></script>
 </body>
-
 </html>

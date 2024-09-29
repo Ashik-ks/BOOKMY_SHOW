@@ -29,10 +29,18 @@ exports.Addmovie = async function (req, res) {
         let image = body.image;
         console.log("image : ", image)
 
+        let bgimage = body.bgimage;
+        console.log("bgimage : ",bgimage)
+
         if (image) {
             let img_path = await fileUpload(image, "movie");
             console.log("img_path", img_path);
             body.image = img_path
+        }
+        if (bgimage) {
+            let img_path = await fileUpload(bgimage, "movie");
+            console.log("img_path1", img_path);
+            body.bgimage = img_path
         }
 
         let name = body.name;
@@ -47,7 +55,7 @@ exports.Addmovie = async function (req, res) {
                 message: "User already exists",
             });
 
-            res.status(response.statusCode).send(response);
+            res.status(response.statuscode).send(response);
             return
         }
 
@@ -115,7 +123,7 @@ exports.GetSinglemovie = async function (req, res) {
         let _id = req.params.id;
         console.log("_id : ", _id);
 
-        let Single_MovieData = await Movies.find({ _id });
+        let Single_MovieData = await Movies.find({ _id }).populate("category").populate("language");
         console.log("SingleMovieData : ", Single_MovieData)
 
         let response = {
@@ -135,6 +143,7 @@ exports.GetSinglemovie = async function (req, res) {
             message: "Movie not Getting",
         }
         res.status(response.statuscode).send(response);
+        return;
     }
 }
 
@@ -147,7 +156,7 @@ exports.Updatemovie = async function (req, res) {
         let _id = req.params.id;
         console.log("_id : ", _id);
 
-        let Category_Collection = await Category.findOne({ category: body.category });
+        let Category_Collection = await Category.findOne({ category: body.category }).populate("category");
         console.log("Category_Collection : ", Category_Collection);
 
         let category_id = Category_Collection._id;
@@ -155,7 +164,7 @@ exports.Updatemovie = async function (req, res) {
 
         body.category = category_id;
 
-        let language_Collection = await language.findOne({ language: body.language });
+        let language_Collection = await language.findOne({ language: body.language }).populate("language");
         console.log("language_Collection : ", language_Collection);
 
         let language_id = language_Collection._id;
@@ -166,15 +175,29 @@ exports.Updatemovie = async function (req, res) {
         let image = body.image;
         console.log("image :", image);
 
+        let bgimage = body.bgimage;
+        console.log("bgimage :", bgimage);
+
         const regexp = /^data:/;
         const result = regexp.test(image);
         console.log("result : ", result);
+
+        const regexp1 = /^data:/;
+        const result1 = regexp1.test(bgimage);
+        console.log("result1 : ", result1);
 
         if (result === true) {
 
             let img_path = await fileUpload(image, "movie");
             console.log("img_path", img_path);
             body.image = img_path
+        }
+
+        if (result1 === true) {
+
+            let img_path = await fileUpload(bgimage, "movie");
+            console.log("img_path", img_path);
+            body.bgimage = img_path
         }
 
         let Update_Movie = await Movies.updateOne({ _id }, { $set: body });
@@ -236,37 +259,72 @@ exports.Moviefilter = async function (req, res) {
 
 
     if (filter.category) {
-        try {
+        if(filter.category === 'none'){
+            try {
 
-            let category = req.query.category;
-            console.log("category : ", category);
-
-            let category_Field = await Category.findOne({ category: filter.category });
-            console.log("category_Field :", category_Field);
-
-            let category_id = category_Field._id;
-            console.log("category_id : ", category_id);
-
-            let categorized_movie = await Movies.find({ category: category_id }).populate("category");
-            let response = success_function({
-                statusCode: 200,
-                data: categorized_movie
-
-            })
-            res.status(response.statuscode).send(response);
-
-            return;
-
-
-        } catch (error) {
-            console.log("error : ", error)
-            let response = {
-                success: false,
-                statuscode: 400,
-                message: "Movie not Getting",
+                let languages = req.query.language;
+                console.log("languages : ", languages);
+    
+                let language_Field = await language.findOne({ language: languages });
+                console.log("language_Field :", language_Field);
+    
+                let language_id = language_Field._id;
+                console.log("language_id : ", language_id);
+    
+                let categorized_movie = await Movies.find({ language: language_id }).populate("language").populate("category");
+                let response = success_function({
+                    statusCode: 200,
+                    data: categorized_movie
+    
+                })
+                res.status(response.statuscode).send(response);
+    
+                return;
+    
+    
+            } catch (error) {
+                console.log("error : ", error)
+                let response = {
+                    success: false,
+                    statuscode: 400,
+                    message: "Movie not Getting",
+                }
+                res.status(response.statuscode).send(response);
             }
-            res.status(response.statuscode).send(response);
+        }else{
+            try {
+
+                let category = req.query.category;
+                console.log("category : ", category);
+    
+                let category_Field = await Category.findOne({ category: filter.category });
+                console.log("category_Field :", category_Field);
+    
+                let category_id = category_Field._id;
+                console.log("category_id : ", category_id);
+    
+                let categorized_movie = await Movies.find({ category: category_id }).populate("category");
+                let response = success_function({
+                    statusCode: 200,
+                    data: categorized_movie
+    
+                })
+                res.status(response.statuscode).send(response);
+    
+                return;
+    
+    
+            } catch (error) {
+                console.log("error : ", error)
+                let response = {
+                    success: false,
+                    statuscode: 400,
+                    message: "Movie not Getting",
+                }
+                res.status(response.statuscode).send(response);
+            }
         }
+        
     } else if (filter.language && filter.category) {
 
         try {
@@ -390,3 +448,114 @@ exports.Getlanguages = async function (req, res) {
         res.status(response.statuscode).send(response);
     }
 }
+
+// exports.Moviefilter = async function (req, res) {
+
+//     let filter = req.query
+//     console.log("filter : ", filter);
+
+
+//     if (filter.category) {
+//         try {
+
+//             let category = req.query.category;
+//             console.log("category : ", category);
+
+//             let category_Field = await Category.findOne({ category: filter.category });
+//             console.log("category_Field :", category_Field);
+
+//             let category_id = category_Field._id;
+//             console.log("category_id : ", category_id);
+
+//             let categorized_movie = await Movies.find({ category: category_id }).populate("category");
+//             let response = success_function({
+//                 statusCode: 200,
+//                 data: categorized_movie
+
+//             })
+//             res.status(response.statuscode).send(response);
+
+//             return;
+
+
+//         } catch (error) {
+//             console.log("error : ", error)
+//             let response = {
+//                 success: false,
+//                 statuscode: 400,
+//                 message: "Movie not Getting",
+//             }
+//             res.status(response.statuscode).send(response);
+//         }
+//     } else if (filter.language && filter.category) {
+
+//         try {
+//             let language = req.query.language;
+
+//             let language_Field = await language.findOne({ language });
+//             console.log("language_Field :", language_Field);
+
+//             let language_id = language_Field._id;
+//             console.log("language_id : ", language_id);
+
+
+//             let category = req.query.category;
+
+//             let category_Field = await category.findOne({ category });
+//             console.log("category_Field :", category_Field);
+
+//             let category_id = category_Field._id;
+//             console.log("category_id : ", category_id);
+
+//             let both_movie = await Movies.find({ language: language_id } && { category: category_id }).populate("category");
+//             let response = success_function({
+//                 statusCode: 200,
+//                 data: both_movie
+
+//             })
+//             res.status(response.statuscode).send(response);
+
+//             return;
+//         } catch (error) {
+//             console.log("error : ", error)
+//             let response = {
+//                 success: false,
+//                 statuscode: 400,
+//                 message: "Movie not Getting",
+//             }
+//             res.status(response.statuscode).send(response);
+//         }
+//     } else if (filter.language) {
+//         try {
+
+//             let languages = req.query.language;
+//             console.log("languages : ", languages);
+
+//             let language_Field = await language.findOne({ language: languages });
+//             console.log("language_Field :", language_Field);
+
+//             let language_id = language_Field._id;
+//             console.log("language_id : ", language_id);
+
+//             let categorized_movie = await Movies.find({ language: language_id }).populate("language");
+//             let response = success_function({
+//                 statusCode: 200,
+//                 data: categorized_movie
+
+//             })
+//             res.status(response.statuscode).send(response);
+
+//             return;
+
+
+//         } catch (error) {
+//             console.log("error : ", error)
+//             let response = {
+//                 success: false,
+//                 statuscode: 400,
+//                 message: "Movie not Getting",
+//             }
+//             res.status(response.statuscode).send(response);
+//         }
+//     }
+// }
