@@ -3,7 +3,11 @@ let Category = require('../db/model/category');
 let language = require('../db/model/language');
 const { success_function, error_function } = require('../utils/responsehandler');
 const { response, query } = require('express');
-const fileUpload = require('../utils/file-upload').fileUpload
+const fileUpload = require('../utils/file-upload').fileUpload;
+const fileDelete = require('../utils/file-delete').fileDelete;
+const path = require('path');
+
+
 
 exports.Addmovie = async function (req, res) {
     try {
@@ -30,7 +34,7 @@ exports.Addmovie = async function (req, res) {
         console.log("image : ", image)
 
         let bgimage = body.bgimage;
-        console.log("bgimage : ",bgimage)
+        console.log("bgimage : ", bgimage)
 
         if (image) {
             let img_path = await fileUpload(image, "movie");
@@ -99,17 +103,17 @@ exports.Getmovie = async function (req, res) {
 
         let filterArr = [];
 
-        if(category){
-            filterArr.push({category})
-            console.log("category :",category)
+        if (category) {
+            filterArr.push({ category })
+            console.log("category :", category)
         }
 
-        if(language){
-            filterArr.push({language})
+        if (language) {
+            filterArr.push({ language })
         }
-        console.log("filterArr : ",filterArr)
+        console.log("filterArr : ", filterArr)
 
-        let Movie_Data = await Movies.find(filterArr.length > 0 ? {$and : filterArr} : {}).populate("category").populate("language");
+        let Movie_Data = await Movies.find(filterArr.length > 0 ? { $and: filterArr } : {}).populate("category").populate("language");
         console.log("Movie_Data : ", Movie_Data);
 
         let response = {
@@ -187,36 +191,54 @@ exports.Updatemovie = async function (req, res) {
 
         body.language = language_id;
 
-        let image = body.image;
-        console.log("image :", image);
+        let splittedImg;
 
-        let bgimage = body.bgimage;
-        console.log("bgimage :", bgimage);
+        if (body.image) {
 
-        const regexp = /^data:/;
-        const result = regexp.test(image);
-        console.log("result : ", result);
+            let image_path = await Movies.findOne({ _id });
 
-        const regexp1 = /^data:/;
-        const result1 = regexp1.test(bgimage);
-        console.log("result1 : ", result1);
+            splittedImg = image_path.image.split('/')[2];
+            console.log("splittedIMG : ", splittedImg);
 
-        if (result === true) {
+            let image = body.image;
+            console.log("image :", image);
 
             let img_path = await fileUpload(image, "movie");
             console.log("img_path", img_path);
             body.image = img_path
+
         }
 
-        if (result1 === true) {
+        let splittedBgImg;
 
-            let img_path = await fileUpload(bgimage, "movie");
-            console.log("img_path", img_path);
-            body.bgimage = img_path
+        if (body.bgimage) {
+
+            let image_path = await Movies.findOne({ _id });
+
+            splittedBgImg = image_path.bgimage.split('/')[2];
+            console.log("splittedBgIMG : ", splittedBgImg);
+
+            let bgimage = body.bgimage;
+            console.log("bgimage :", bgimage);
+
+            let bgImg_path = await fileUpload(bgimage, "movie");
+            console.log("bgImg_path", bgImg_path);
+            body.bgimage = bgImg_path;
+
         }
 
         let Update_Movie = await Movies.updateOne({ _id }, { $set: body });
         console.log("Update_Movie : ", Update_Movie);
+
+        if(body.image){
+            const imagePath = path.join('./uploads', 'movie', splittedImg);
+            fileDelete(imagePath);
+        }
+
+        if(body.bgimage){
+            const bgImagePath = path.join('./uploads', 'movie', splittedBgImg);
+            fileDelete(bgImagePath);
+        }
 
         let response = {
             success: true,
