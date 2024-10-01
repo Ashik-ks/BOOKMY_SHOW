@@ -94,7 +94,22 @@ exports.Addmovie = async function (req, res) {
 exports.Getmovie = async function (req, res) {
     try {
 
-        let Movie_Data = await Movies.find().populate("category").populate("language");
+        let category = req.query.category;
+        let language = req.query.language;
+
+        let filterArr = [];
+
+        if(category){
+            filterArr.push({category})
+            console.log("category :",category)
+        }
+
+        if(language){
+            filterArr.push({language})
+        }
+        console.log("filterArr : ",filterArr)
+
+        let Movie_Data = await Movies.find(filterArr.length > 0 ? {$and : filterArr} : {}).populate("category").populate("language");
         console.log("Movie_Data : ", Movie_Data);
 
         let response = {
@@ -252,152 +267,6 @@ exports.Deletemovie = async function (req, res) {
     }
 }
 
-exports.Moviefilter = async function (req, res) {
-
-    let filter = req.query
-    console.log("filter : ", filter);
-
-
-    if (filter.category) {
-        if(filter.category === 'none'){
-            try {
-
-                let languages = req.query.language;
-                console.log("languages : ", languages);
-    
-                let language_Field = await language.findOne({ language: languages });
-                console.log("language_Field :", language_Field);
-    
-                let language_id = language_Field._id;
-                console.log("language_id : ", language_id);
-    
-                let categorized_movie = await Movies.find({ language: language_id }).populate("language").populate("category");
-                let response = success_function({
-                    statusCode: 200,
-                    data: categorized_movie
-    
-                })
-                res.status(response.statuscode).send(response);
-    
-                return;
-    
-    
-            } catch (error) {
-                console.log("error : ", error)
-                let response = {
-                    success: false,
-                    statuscode: 400,
-                    message: "Movie not Getting",
-                }
-                res.status(response.statuscode).send(response);
-            }
-        }else{
-            try {
-
-                let category = req.query.category;
-                console.log("category : ", category);
-    
-                let category_Field = await Category.findOne({ category: filter.category });
-                console.log("category_Field :", category_Field);
-    
-                let category_id = category_Field._id;
-                console.log("category_id : ", category_id);
-    
-                let categorized_movie = await Movies.find({ category: category_id }).populate("category");
-                let response = success_function({
-                    statusCode: 200,
-                    data: categorized_movie
-    
-                })
-                res.status(response.statuscode).send(response);
-    
-                return;
-    
-    
-            } catch (error) {
-                console.log("error : ", error)
-                let response = {
-                    success: false,
-                    statuscode: 400,
-                    message: "Movie not Getting",
-                }
-                res.status(response.statuscode).send(response);
-            }
-        }
-        
-    } else if (filter.language && filter.category) {
-
-        try {
-            let language = req.query.language;
-
-            let language_Field = await language.findOne({ language });
-            console.log("language_Field :", language_Field);
-
-            let language_id = language_Field._id;
-            console.log("language_id : ", language_id);
-
-
-            let category = req.query.category;
-
-            let category_Field = await category.findOne({ category });
-            console.log("category_Field :", category_Field);
-
-            let category_id = category_Field._id;
-            console.log("category_id : ", category_id);
-
-            let both_movie = await Movies.find({ language: language_id } && { category: category_id }).populate("category");
-            let response = success_function({
-                statusCode: 200,
-                data: both_movie
-
-            })
-            res.status(response.statuscode).send(response);
-
-            return;
-        } catch (error) {
-            console.log("error : ", error)
-            let response = {
-                success: false,
-                statuscode: 400,
-                message: "Movie not Getting",
-            }
-            res.status(response.statuscode).send(response);
-        }
-    } else if (filter.language) {
-        try {
-
-            let languages = req.query.language;
-            console.log("languages : ", languages);
-
-            let language_Field = await language.findOne({ language: languages });
-            console.log("language_Field :", language_Field);
-
-            let language_id = language_Field._id;
-            console.log("language_id : ", language_id);
-
-            let categorized_movie = await Movies.find({ language: language_id }).populate("language");
-            let response = success_function({
-                statusCode: 200,
-                data: categorized_movie
-
-            })
-            res.status(response.statuscode).send(response);
-
-            return;
-
-
-        } catch (error) {
-            console.log("error : ", error)
-            let response = {
-                success: false,
-                statuscode: 400,
-                message: "Movie not Getting",
-            }
-            res.status(response.statuscode).send(response);
-        }
-    }
-}
-
 exports.Getcategories = async function (req, res) {
 
     try {
@@ -449,113 +318,3 @@ exports.Getlanguages = async function (req, res) {
     }
 }
 
-// exports.Moviefilter = async function (req, res) {
-
-//     let filter = req.query
-//     console.log("filter : ", filter);
-
-
-//     if (filter.category) {
-//         try {
-
-//             let category = req.query.category;
-//             console.log("category : ", category);
-
-//             let category_Field = await Category.findOne({ category: filter.category });
-//             console.log("category_Field :", category_Field);
-
-//             let category_id = category_Field._id;
-//             console.log("category_id : ", category_id);
-
-//             let categorized_movie = await Movies.find({ category: category_id }).populate("category");
-//             let response = success_function({
-//                 statusCode: 200,
-//                 data: categorized_movie
-
-//             })
-//             res.status(response.statuscode).send(response);
-
-//             return;
-
-
-//         } catch (error) {
-//             console.log("error : ", error)
-//             let response = {
-//                 success: false,
-//                 statuscode: 400,
-//                 message: "Movie not Getting",
-//             }
-//             res.status(response.statuscode).send(response);
-//         }
-//     } else if (filter.language && filter.category) {
-
-//         try {
-//             let language = req.query.language;
-
-//             let language_Field = await language.findOne({ language });
-//             console.log("language_Field :", language_Field);
-
-//             let language_id = language_Field._id;
-//             console.log("language_id : ", language_id);
-
-
-//             let category = req.query.category;
-
-//             let category_Field = await category.findOne({ category });
-//             console.log("category_Field :", category_Field);
-
-//             let category_id = category_Field._id;
-//             console.log("category_id : ", category_id);
-
-//             let both_movie = await Movies.find({ language: language_id } && { category: category_id }).populate("category");
-//             let response = success_function({
-//                 statusCode: 200,
-//                 data: both_movie
-
-//             })
-//             res.status(response.statuscode).send(response);
-
-//             return;
-//         } catch (error) {
-//             console.log("error : ", error)
-//             let response = {
-//                 success: false,
-//                 statuscode: 400,
-//                 message: "Movie not Getting",
-//             }
-//             res.status(response.statuscode).send(response);
-//         }
-//     } else if (filter.language) {
-//         try {
-
-//             let languages = req.query.language;
-//             console.log("languages : ", languages);
-
-//             let language_Field = await language.findOne({ language: languages });
-//             console.log("language_Field :", language_Field);
-
-//             let language_id = language_Field._id;
-//             console.log("language_id : ", language_id);
-
-//             let categorized_movie = await Movies.find({ language: language_id }).populate("language");
-//             let response = success_function({
-//                 statusCode: 200,
-//                 data: categorized_movie
-
-//             })
-//             res.status(response.statuscode).send(response);
-
-//             return;
-
-
-//         } catch (error) {
-//             console.log("error : ", error)
-//             let response = {
-//                 success: false,
-//                 statuscode: 400,
-//                 message: "Movie not Getting",
-//             }
-//             res.status(response.statuscode).send(response);
-//         }
-//     }
-// }

@@ -118,7 +118,7 @@ async function submitData(dataUrl, dataUrl2) {
     console.log("str_AddData: ", str_AddData);
 
     try {
-        let response = await fetch('/submit', {
+        let response = await fetch('/movies', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -141,10 +141,9 @@ async function submitData(dataUrl, dataUrl2) {
     }
 }
 
-
 async function getMovie() {
     try {
-        let response = await fetch('/submit')
+        let response = await fetch('/movies')
     console.log("response : ", response);
 
     let parsed_response = await response.json();
@@ -199,8 +198,6 @@ function handleClickUser(id) {
     window.location.href = `userSingleView.html?id=${id}`
 }
 
-
-
 async function UserSingleData() {
     let location = window.location;
     console.log("location", location);
@@ -215,7 +212,7 @@ async function UserSingleData() {
     console.log("id ", id, typeof (id));
 
     try {
-        let response = await fetch(`/submit/${id}`);
+        let response = await fetch(`/movie/${id}`);
         console.log("response : ", response);
 
         let parsed_response = await response.json();
@@ -285,13 +282,9 @@ async function UserSingleData() {
     }
 }
 
-
-
-
-
 async function GetData() {
     try {
-        let response = await fetch('/submit');
+        let response = await fetch('/movies');
         console.log("response : ", response);
 
         let display = await response.json();
@@ -409,7 +402,7 @@ async function Currentdata() {
 
 
     try {
-        let form_response = await fetch(`/submit/${id}`);
+        let form_response = await fetch(`/movies/${id}`);
         let form_parse_data = await form_response.json();
         let data = form_parse_data.data
         console.log("data : ", data)
@@ -493,7 +486,7 @@ async function updateData(dataUrl1, dataUrl3) {
     let id = params.get('id');
 
     try {
-        let response = await fetch(`/update/${id}`, {
+        let response = await fetch(`/movies/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -519,7 +512,7 @@ async function handleClickDelete(id) {
     console.log("params", params);
 
     try {
-        let Delete_response = await fetch(`/delete/${id}`, {
+        let Delete_response = await fetch(`/movies/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': "application/json"
@@ -540,40 +533,144 @@ async function handleClickDelete(id) {
     }
 }
 
+async function getSelectBox1() {
+    try {
+        let response = await fetch('/categories');
+        console.log("response : ", response);
+
+        let Parsed_response = await response.json();
+        console.log("Parsed_response : ", Parsed_response);
+
+        let Parsed_response_category = Parsed_response.data;
+        console.log("Parsed_response_category : ", Parsed_response_category);
+
+        let div = document.getElementById('category');
+        let rows = '';
+       
+        for (let i = 0; i < Parsed_response_category.length; i++) {
+            rows += `
+            <option value="${Parsed_response_category[i].category}">${Parsed_response_category[i].category}</option>
+            `;
+        }
+        rows += `<option value="none">none</option>`;
+
+        div.innerHTML = rows;
+    } catch (error) {
+        console.error("Error fetching categories: ", error);
+    }
+
+    try {
+        let response = await fetch('/languages');
+        console.log("response : ", response);
+
+        let Parsed_response = await response.json();
+        console.log("Parsed_response : ", Parsed_response);
+
+        let Parsed_response_language = Parsed_response.data;
+        console.log("Parsed_response_language : ", Parsed_response_language);
+
+        let div = document.getElementById('language');
+        let rows = ''
+
+        for (i = 0; i < Parsed_response_language.length; i++) {
+            rows = rows + `
+            <option value="${Parsed_response_language[i].language}">${Parsed_response_language[i].language}</option>
+            `;
+        }
+        rows += `<option value="none">none</option>`;
+        div.innerHTML = rows
+
+    } catch (error) {
+
+    }
+}
+
 async function filter(event) {
     event.preventDefault();
     let category = document.getElementById('category').value;
     console.log("category : ", category);
 
     let language = document.getElementById('language').value;
-    console.log("language : ", language)
+    console.log("language : ", language);
 
-    let response = await fetch(`/filter?category=${category}&language=${language}`);
-    console.log("response : ", response);
+    let category_id;
+    if (category) {
+        try {
+            let response = await fetch('/categories');
+            console.log("response : ", response);
+    
+            let parsedResponse = await response.json();
+            console.log("Parsed_response : ", parsedResponse);
+    
+            let parsedResponseCategory = parsedResponse.data;
+            console.log("Parsed_response_category : ", parsedResponseCategory);
+            
+            for (let i = 0; i < parsedResponseCategory.length; i++) {
+                if (category === parsedResponseCategory[i].category) {
+                    category_id = parsedResponseCategory[i]._id;
+                    console.log("category_id : ", category_id);
+                    break; 
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching categories: ", error);
+        }
+    }
 
-    let display = await response.json();
-    console.log("display : ", display);
+    let language_id;
+    if (language) {
+        try {
+            let response = await fetch('/languages');
+            console.log("response : ", response);
+    
+            let parsedResponse = await response.json();
+            console.log("Parsed_response : ", parsedResponse);
+    
+            let parsedResponselanguage = parsedResponse.data;
+            console.log("Parsed_response_language : ", parsedResponselanguage);
+            
+            for (let i = 0; i < parsedResponselanguage.length; i++) {
+                if (language === parsedResponselanguage[i].language) {
+                    language_id = parsedResponselanguage[i]._id;
+                    console.log("language_id : ", language_id);
+                    break; 
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching languages: ", error);
+        }
+    }
 
-    let parsed_display = display.data;
-    console.log("parsed_display : ", parsed_display);
+    try {
+        let moviesResponse = await fetch(`/movies?${category_id ? 'category=' + category_id : ''}${language_id ? '&language=' + language_id : ''}`);
+        console.log("response : ", moviesResponse);
 
-    let filtercontainer = document.getElementById('filtercontainer');
+        let display = await moviesResponse.json();
+        console.log("display : ", display);
 
-    let rows = '';
+        let parsedDisplay = display.data;
+        console.log("parsed_display : ", parsedDisplay);
 
-    for (i = 0; i < parsed_display.length; i++) {
-        let id = parsed_display[i]._id
-        rows = rows + `
-        <div class="container d-flex-row lh-lg pb-3 pt-3" onclick="handleClickUser('${id}')">
-                  <div class = "bg-dark text-light imageratingdiv">
-                  <div class ="text-center" ><img  src ="${parsed_display[i].image} "class = "indexcontainerimg">
-                  </div>
-                   
-                    <div class ="text-center datacontainertext1 d-flex"><div id="star">&#11088;</div>${parsed_display[i].rating}/10 <div class="ms-2">48K Votes</div></div></div>
-                    <div class =" mt-2  datacontainertext2 ">${parsed_display[i].name}</div>
-                    <div class =" datacontainertext3">${parsed_display[i].category.category}</div>
-                  </div>
-        `
-        filtercontainer.innerHTML = rows
+        let filterContainer = document.getElementById('filtercontainer');
+        let rows = '';
+
+        for (let i = 0; i < parsedDisplay.length; i++) {
+            let id = parsedDisplay[i]._id;
+            rows += `
+            <div class="container d-flex-row lh-lg pb-3 pt-3" onclick="handleClickUser('${id}')">
+                <div class="bg-dark text-light imageratingdiv">
+                    <div class="text-center"><img src="${parsedDisplay[i].image}" class="indexcontainerimg"></div>
+                    <div class="text-center datacontainertext1 d-flex">
+                        <div id="star">&#11088;</div>${parsedDisplay[i].rating}/10 <div class="ms-2">48K Votes</div>
+                    </div>
+                    <div class="mt-2 datacontainertext2">${parsedDisplay[i].name}</div>
+                    <div class="datacontainertext3">${parsedDisplay[i].category.category}</div>
+                </div>
+            </div>
+            `;
+        }
+        filterContainer.innerHTML = rows;
+    } catch (error) {
+        console.error("Error fetching movies: ", error);
     }
 }
