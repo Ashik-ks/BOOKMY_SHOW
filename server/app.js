@@ -13,7 +13,7 @@ app.use(express.static('../client'));
 app.use('/uploads',express.static("./uploads"));
 app.use(express.json())
 app.use(express.urlencoded({extended: true }));
-app.use(express.json({ limit: "7mb" }));
+app.use(express.json({ limit: "500mb" }));
 app.use(router)
 
 

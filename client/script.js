@@ -402,7 +402,7 @@ async function Currentdata() {
 
 
     try {
-        let form_response = await fetch(`/movies/${id}`);
+        let form_response = await fetch(`/movie/${id}`);
         let form_parse_data = await form_response.json();
         let data = form_parse_data.data
         console.log("data : ", data)
@@ -480,7 +480,9 @@ async function updateData(dataUrl1, dataUrl3) {
         description,
         rating,
     };
+    console.log("UpdateData : ",UpdateDatas)
     let Str_UpdateData = JSON.stringify(UpdateDatas);
+    console.log("Str_UpdateData : ",Str_UpdateData)
 
     let params = new URLSearchParams(window.location.search);
     let id = params.get('id');
